@@ -48,39 +48,88 @@
 
       </form>
 
+      <!-- Tombol kembali -->
+      <a href="/" class="back-button">
+        ← Kembali
+      </a>
+
     </div>
 
   </div>
 
+
   <script>
-    document.getElementById("loginForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
 
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      const message = document.getElementById("message");
+    document
+      .getElementById("loginForm")
+      .addEventListener("submit", async function(e) {
 
-      const response = await fetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          username,
-          password
-        })
+        e.preventDefault();
+
+        const username =
+          document.getElementById("username").value;
+
+        const password =
+          document.getElementById("password").value;
+
+        const message =
+          document.getElementById("message");
+
+
+        try {
+
+          const response = await fetch("/login", {
+
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+              username,
+              password
+            })
+
+          });
+
+
+          const result =
+            await response.json();
+
+
+          if (result.success) {
+
+            localStorage.setItem(
+              "adminToken",
+              result.token
+            );
+
+            window.location.href =
+              "/dashboard";
+
+          } else {
+
+            message.textContent =
+              result.message;
+
+            message.style.color =
+              "red";
+
+          }
+
+        } catch (error) {
+
+          message.textContent =
+            "Terjadi kesalahan pada server";
+
+          message.style.color =
+            "red";
+
+        }
+
       });
 
-      const result = await response.json();
-
-      if (result.success) {
-        localStorage.setItem("adminLogin", "true");
-        window.location.href = "/dashboard";
-      } else {
-        message.textContent = result.message;
-        message.style.color = "red";
-      }
-    });
   </script>
 
 </body>
