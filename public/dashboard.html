@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Dashboard Admin - Nusantara Food</title>
+
+  <link rel="stylesheet" href="/style.css">
+
+  <style>
+    /* =========================
+       DASHBOARD CRUD
+    ========================= */
+
+    .dashboard-section {
+      margin-bottom: 55px;
+    }
+
+    .dashboard-title {
+      margin-bottom: 25px;
+    }
+
+    /* CARD FOOD */
+
+    .food-card {
+      position: relative;
+    }
+
+    .food-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .edit-btn,
+    .delete-btn {
+      border: none;
+      padding: 9px 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .edit-btn {
+      background: #eeeeee;
+      color: #222;
+    }
+
+    .edit-btn:hover {
+      background: #dddddd;
+    }
+
+    .delete-btn {
+      background: #222;
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background: #000;
+    }
+
+
+    /* =========================
+       CATEGORY
+    ========================= */
+
+    .category-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .category-card {
+      background: white;
+      padding: 18px 20px;
+      border-radius: 10px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    }
+
+    .category-card strong {
+      font-size: 16px;
+    }
+
+    .category-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+
+    /* =========================
+       MODAL
+    ========================= */
+
+    .modal {
+      display: none;
+
+      position: fixed;
+
+      inset: 0;
+
+      background: rgba(0, 0, 0, 0.45);
+
+      justify-content: center;
+      align-items: center;
+
+      z-index: 999;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      width: 90%;
+      max-width: 500px;
+
+      background: white;
+
+      padding: 30px;
+
+      border-radius: 15px;
+
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .modal-content h2 {
+      margin-bottom: 25px;
+    }
+
+    .modal-group {
+      margin-bottom: 18px;
+    }
+
+    .modal-group label {
+      display: block;
+
+      margin-bottom: 7px;
+
+      font-weight: bold;
+
+      font-size: 14px;
+    }
+
+    .modal-group input,
+    .modal-group select,
+    .modal-group textarea {
+      width: 100%;
+
+      padding: 11px 12px;
+
+      border: 1px solid #ccc;
+
+      border-radius: 8px;
+
+      font-size: 14px;
+
+      font-family: Arial, sans-serif;
+
+      outline: none;
+    }
+
+    .modal-group textarea {
+      min-height: 90px;
+
+      resize: vertical;
+    }
+
+    .modal-group input:focus,
+    .modal-group select:focus,
+    .modal-group textarea:focus {
+      border-color: #222;
+    }
+
+    .modal-actions {
+      display: flex;
+
+      justify-content: flex-end;
+
+      gap: 10px;
+
+      margin-top: 25px;
+    }
+
+    .cancel-btn,
+    .save-btn {
+      border: none;
+
+      padding: 11px 18px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-weight: bold;
+    }
+
+    .cancel-btn {
+      background: #eee;
+
+      color: #222;
+    }
+
+    .save-btn {
+      background: #222;
+
+      color: white;
+    }
+
+    .cancel-btn:hover {
+      background: #ddd;
+    }
+
+    .save-btn:hover {
+      background: #000;
+    }
+
+    .empty {
+      background: white;
+
+      padding: 25px;
+
+      border-radius: 10px;
+
+      color: #777;
+
+      text-align: center;
+
+      grid-column: 1 / -1;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 900px) {
+
+      .category-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+    }
+
+    @media (max-width: 600px) {
+
+      .category-list {
+        grid-template-columns: 1fr;
+      }
+
+      .food-actions {
+        flex-direction: column;
+      }
+
+      .edit-btn,
+      .delete-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="dashboard">
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header class="dashboard-header">
+
+      <div>
+        <h1>🍜 Nusantara Food</h1>
+
+        <p>
+          Dashboard Admin
+        </p>
+      </div>
+
+      <a href="/" class="logout-btn">
+        Keluar
+      </a>
+
+    </header>
+
+
+    <!-- =========================
+         FOOD
+    ========================= -->
+
+    <section class="dashboard-section">
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2>Daftar Makanan</h2>
+
+          <p>
+            Kelola data makanan khas Indonesia
+          </p>
+        </div>
+
+        <button
+          class="add-btn"
+          onclick="openFoodModal()"
+        >
+          + Tambah Makanan
+        </button>
+
+      </div>
+
+
+      <div
+        id="food-list"
+        class="food-list"
+      >
+        <p>Memuat data makanan...</p>
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         CATEGORY
+    ========================= -->
+
+    <section class="dashboard-section">
+
+      <div class="dashboard-title">
+
+        <div>
+          <h2>Kategori Makanan</h2>
+
+          <p>
+            Kelola kategori makanan
+          </p>
+        </div>
+
+        <button
+          class="add-btn"
+          onclick="openCategoryModal()"
+        >
+          + Tambah Kategori
+        </button>
+
+      </div>
+
+
+      <div
+        id="category-list"
+        class="category-list"
+      >
+        <p>Memuat kategori...</p>
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- =================================================
+       MODAL FOOD
+  ================================================== -->
+
+  <div
+    id="foodModal"
+    class="modal"
+  >
+
+    <div class="modal-content">
+
+      <h2 id="foodModalTitle">
+        Tambah Makanan
+      </h2>
+
+
+      <form id="foodForm">
+
+        <input
+          type="hidden"
+          id="foodId"
+        >
+
+
+        <div class="modal-group">
+
+          <label>
+            Kategori
+          </label>
+
+          <select
+            id="foodCategory"
+            required
+          >
+
+            <option value="">
+              Pilih kategori
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="modal-group">
+
+          <label>
+            Nama Makanan
+          </label>
+
+          <input
+            type="text"
+            id="foodName"
+            placeholder="Contoh: Rendang"
+            required
+          >
+
+        </div>
+
+
+        <div class="modal-group">
+
+          <label>
+            Daerah
+          </label>
+
+          <input
+            type="text"
+            id="foodRegion"
+            placeholder="Contoh: Sumatera Barat"
+            required
+          >
+
+        </div>
+
+
+        <div class="modal-group">
+
+          <label>
+            Harga
+          </label>
+
+          <input
+            type="number"
+            id="foodPrice"
+            placeholder="Contoh: 25000"
+            required
+          >
+
+        </div>
+
+
+        <div class="modal-group">
+
+          <label>
+            Deskripsi
+          </label>
+
+          <textarea
+            id="foodDescription"
+            placeholder="Deskripsi makanan..."
+            required
+          ></textarea>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="cancel-btn"
+            onclick="closeFoodModal()"
+          >
+            Batal
+          </button>
+
+          <button
+            type="submit"
+            class="save-btn"
+          >
+            Simpan
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       MODAL CATEGORY
+  ================================================== -->
+
+  <div
+    id="categoryModal"
+    class="modal"
+  >
+
+    <div class="modal-content">
+
+      <h2 id="categoryModalTitle">
+        Tambah Kategori
+      </h2>
+
+
+      <form id="categoryForm">
+
+        <input
+          type="hidden"
+          id="categoryId"
+        >
+
+
+        <div class="modal-group">
+
+          <label>
+            Nama Kategori
+          </label>
+
+          <input
+            type="text"
+            id="categoryName"
+            placeholder="Contoh: Makanan"
+            required
+          >
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="cancel-btn"
+            onclick="closeCategoryModal()"
+          >
+            Batal
+          </button>
+
+          <button
+            type="submit"
+            class="save-btn"
+          >
+            Simpan
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       JAVASCRIPT CRUD
+  ================================================== -->
+
+  <script>
+
+    /* =================================================
+       LOAD FOODS
+    ================================================= */
+
+    async function loadFoods() {
+
+      const foodList =
+        document.getElementById("food-list");
+
+      try {
+
+        const response =
+          await fetch("/foods");
+
+        const foods =
+          await response.json();
+
+        if (!response.ok) {
+
+          throw new Error(
+            foods.error ||
+            "Gagal mengambil data makanan"
+          );
+
+        }
+
+
+        foodList.innerHTML = "";
+
+
+        if (foods.length === 0) {
+
+          foodList.innerHTML = `
+            <div class="empty">
+              Belum ada data makanan.
+            </div>
+          `;
+
+          return;
+        }
+
+
+        foods.forEach(food => {
+
+          const card =
+            document.createElement("div");
+
+          card.className =
+            "food-card";
+
+
+          card.innerHTML = `
+
+            <div>
+
+              <h3>
+                ${food.name}
+              </h3>
+
+              <p class="region">
+                📍 ${food.region}
+              </p>
+
+              <p>
+                ${food.description || "-"}
+              </p>
+
+            </div>
+
+
+            <div class="food-price">
+
+              Rp ${Number(food.price)
+                .toLocaleString("id-ID")}
+
+            </div>
+
+
+            <div class="food-actions">
+
+              <button
+                class="edit-btn"
+                onclick='editFood(${JSON.stringify(food)})'
+              >
+                ✏️ Edit
+              </button>
+
+              <button
+                class="delete-btn"
+                onclick="deleteFood(${food.id})"
+              >
+                🗑️ Hapus
+              </button>
+
+            </div>
+
+          `;
+
+
+          foodList.appendChild(card);
+
+        });
+
+      }
+
+      catch (error) {
+
+        foodList.innerHTML = `
+
+          <div class="error">
+
+            Gagal memuat data makanan:
+            ${error.message}
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* =================================================
+       LOAD CATEGORIES
+    ================================================== */
+
+    async function loadCategories() {
+
+      const categoryList =
+        document.getElementById("category-list");
+
+      const categorySelect =
+        document.getElementById("foodCategory");
+
+
+      try {
+
+        const response =
+          await fetch("/categories");
+
+        const categories =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            categories.error ||
+            "Gagal mengambil kategori"
+          );
+
+        }
+
+
+        /* LIST CATEGORY */
+
+        categoryList.innerHTML = "";
+
+
+        if (categories.length === 0) {
+
+          categoryList.innerHTML = `
+            <div class="empty">
+              Belum ada kategori.
+            </div>
+          `;
+
+        }
+
+
+        categories.forEach(category => {
+
+          const card =
+            document.createElement("div");
+
+          card.className =
+            "category-card";
+
+
+          card.innerHTML = `
+
+            <strong>
+              ${category.name}
+            </strong>
+
+            <div class="category-actions">
+
+              <button
+                class="edit-btn"
+                onclick='editCategory(${JSON.stringify(category)})'
+              >
+                ✏️
+              </button>
+
+              <button
+                class="delete-btn"
+                onclick="deleteCategory(${category.id})"
+              >
+                🗑️
+              </button>
+
+            </div>
+
+          `;
+
+
+          categoryList.appendChild(card);
+
+        });
+
+
+        /* SELECT CATEGORY */
+
+        categorySelect.innerHTML = `
+          <option value="">
+            Pilih kategori
+          </option>
+        `;
+
+
+        categories.forEach(category => {
+
+          categorySelect.innerHTML += `
+
+            <option value="${category.id}">
+              ${category.name}
+            </option>
+
+          `;
+
+        });
+
+      }
+
+      catch (error) {
+
+        categoryList.innerHTML = `
+
+          <div class="error">
+
+            Gagal memuat kategori:
+            ${error.message}
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    /* =================================================
+       FOOD MODAL
+    ================================================== */
+
+    function openFoodModal() {
+
+      document.getElementById("foodModalTitle")
+        .textContent = "Tambah Makanan";
+
+      document.getElementById("foodForm")
+        .reset();
+
+      document.getElementById("foodId")
+        .value = "";
+
+      document.getElementById("foodModal")
+        .classList.add("active");
+
+    }
+
+
+    function closeFoodModal() {
+
+      document.getElementById("foodModal")
+        .classList.remove("active");
+
+    }
+
+
+    /* =================================================
+       EDIT FOOD
+    ================================================== */
+
+    function editFood(food) {
+
+      document.getElementById("foodModalTitle")
+        .textContent = "Edit Makanan";
+
+
+      document.getElementById("foodId")
+        .value = food.id;
+
+      document.getElementById("foodCategory")
+        .value = food.category_id;
+
+      document.getElementById("foodName")
+        .value = food.name;
+
+      document.getElementById("foodRegion")
+        .value = food.region;
+
+      document.getElementById("foodPrice")
+        .value = food.price;
+
+      document.getElementById("foodDescription")
+        .value = food.description;
+
+
+      document.getElementById("foodModal")
+        .classList.add("active");
+
+    }
+
+
+    /* =================================================
+       ADD / UPDATE FOOD
+    ================================================== */
+
+    document.getElementById("foodForm")
+      .addEventListener("submit", async function(e) {
+
+        e.preventDefault();
+
+
+        const id =
+          document.getElementById("foodId").value;
+
+
+        const category_id =
+          document.getElementById("foodCategory").value;
+
+        const name =
+          document.getElementById("foodName").value;
+
+        const region =
+          document.getElementById("foodRegion").value;
+
+        const price =
+          document.getElementById("foodPrice").value;
+
+        const description =
+          document.getElementById("foodDescription").value;
+
+
+        const foodData = {
+
+          category_id: Number(category_id),
+
+          name,
+
+          region,
+
+          price: Number(price),
+
+          description
+
+        };
+
+
+        try {
+
+          let response;
+
+
+          /* UPDATE */
+
+          if (id) {
+
+            response =
+              await fetch(`/foods/${id}`, {
+
+                method: "PUT",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify(foodData)
+
+              });
+
+          }
+
+
+          /* ADD */
+
+          else {
+
+            response =
+              await fetch("/foods", {
+
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify(foodData)
+
+              });
+
+          }
+
+
+          const result =
+            await response.json();
+
+
+          if (!response.ok) {
+
+            throw new Error(
+              result.error ||
+              result.message ||
+              "Gagal menyimpan food"
+            );
+
+          }
+
+
+          alert(
+            id
+              ? "Food berhasil diupdate!"
+              : "Food berhasil ditambahkan!"
+          );
+
+
+          closeFoodModal();
+
+
+          await loadFoods();
+
+
+          await loadCategories();
+
+        }
+
+        catch (error) {
+
+          alert(
+            "Gagal: " +
+            error.message
+          );
+
+        }
+
+      });
+
+
+    /* =================================================
+       DELETE FOOD
+    ================================================== */
+
+    async function deleteFood(id) {
+
+      const yakin =
+        confirm(
+          "Apakah kamu yakin ingin menghapus makanan ini?"
+        );
+
+
+      if (!yakin) {
+        return;
+      }
+
+
+      try {
+
+        const response =
+          await fetch(`/foods/${id}`, {
+
+            method: "DELETE"
+
+          });
+
+
+        const result =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.error ||
+            result.message ||
+            "Gagal menghapus food"
+          );
+
+        }
+
+
+        alert(
+          "Food berhasil dihapus!"
+        );
+
+
+        loadFoods();
+
+      }
+
+      catch (error) {
+
+        alert(
+          "Gagal: " +
+          error.message
+        );
+
+      }
+
+    }
+
+
+    /* =================================================
+       CATEGORY MODAL
+    ================================================== */
+
+    function openCategoryModal() {
+
+      document.getElementById("categoryModalTitle")
+        .textContent = "Tambah Kategori";
+
+      document.getElementById("categoryForm")
+        .reset();
+
+      document.getElementById("categoryId")
+        .value = "";
+
+      document.getElementById("categoryModal")
+        .classList.add("active");
+
+    }
+
+
+    function closeCategoryModal() {
+
+      document.getElementById("categoryModal")
+        .classList.remove("active");
+
+    }
+
+
+    /* =================================================
+       EDIT CATEGORY
+    ================================================== */
+
+    function editCategory(category) {
+
+      document.getElementById("categoryModalTitle")
+        .textContent = "Edit Kategori";
+
+
+      document.getElementById("categoryId")
+        .value = category.id;
+
+
+      document.getElementById("categoryName")
+        .value = category.name;
+
+
+      document.getElementById("categoryModal")
+        .classList.add("active");
+
+    }
+
+
+    /* =================================================
+       ADD / UPDATE CATEGORY
+    ================================================== */
+
+    document.getElementById("categoryForm")
+      .addEventListener("submit", async function(e) {
+
+        e.preventDefault();
+
+
+        const id =
+          document.getElementById("categoryId").value;
+
+
+        const name =
+          document.getElementById("categoryName").value;
+
+
+        try {
+
+          let response;
+
+
+          /* UPDATE */
+
+          if (id) {
+
+            response =
+              await fetch(`/categories/${id}`, {
+
+                method: "PUT",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    name
+                  })
+
+              });
+
+          }
+
+
+          /* ADD */
+
+          else {
+
+            response =
+              await fetch("/categories", {
+
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    name
+                  })
+
+              });
+
+          }
+
+
+          const result =
+            await response.json();
+
+
+          if (!response.ok) {
+
+            throw new Error(
+              result.error ||
+              result.message ||
+              "Gagal menyimpan kategori"
+            );
+
+          }
+
+
+          alert(
+            id
+              ? "Kategori berhasil diupdate!"
+              : "Kategori berhasil ditambahkan!"
+          );
+
+
+          closeCategoryModal();
+
+
+          loadCategories();
+
+        }
+
+        catch (error) {
+
+          alert(
+            "Gagal: " +
+            error.message
+          );
+
+        }
+
+      });
+
+
+    /* =================================================
+       DELETE CATEGORY
+    ================================================== */
+
+    async function deleteCategory(id) {
+
+      const yakin =
+        confirm(
+          "Apakah kamu yakin ingin menghapus kategori ini?"
+        );
+
+
+      if (!yakin) {
+        return;
+      }
+
+
+      try {
+
+        const response =
+          await fetch(`/categories/${id}`, {
+
+            method: "DELETE"
+
+          });
+
+
+        const result =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.error ||
+            result.message ||
+            "Gagal menghapus kategori"
+          );
+
+        }
+
+
+        alert(
+          "Kategori berhasil dihapus!"
+        );
+
+
+        loadCategories();
+
+      }
+
+      catch (error) {
+
+        alert(
+          "Gagal: " +
+          error.message
+        );
+
+      }
+
+    }
+
+
+    /* =================================================
+       CLOSE MODAL KETIKA KLIK DI LUAR
+    ================================================== */
+
+    window.addEventListener("click", function(e) {
+
+      if (
+        e.target ===
+        document.getElementById("foodModal")
+      ) {
+
+        closeFoodModal();
+
+      }
+
+
+      if (
+        e.target ===
+        document.getElementById("categoryModal")
+      ) {
+
+        closeCategoryModal();
+
+      }
+
+    });
+
+
+    /* =================================================
+       LOAD DATA SAAT DASHBOARD DIBUKA
+    ================================================== */
+
+    loadFoods();
+
+    loadCategories();
+
+  </script>
+
+</body>
+</html>
